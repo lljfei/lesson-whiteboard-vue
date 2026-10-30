@@ -74,11 +74,13 @@ import 'lesson-whiteboard-vue/style.css'
 
 全局引入一次样式，并为父容器设置实际高度。默认背景为绿板，示例显式使用白色画笔。Vue 是 peer dependency；不需要全局注册 Konva，也不需要 Ant Design、Less 或自动导入插件。
 
-`expanded` 表示铺满组件容器；浏览器全屏由宿主应用控制。
+Konva、vue-konva 和 Office 渲染器是运行依赖，由 npm 自动安装。Vitest、Vue Test Utils 和 Happy DOM 仅供开发本仓库时使用；使用已发布包的应用无需安装这些测试工具。
+
+`expanded` 表示铺满组件容器；浏览器全屏由接入应用控制。
 
 ## 自定义绘图层与工具栏
 
-宿主需要自己控制布局时，可单独使用 `AnnotationCanvas`。绘图层采用绝对定位，父容器应设置 `position: relative` 和明确尺寸。
+需要自行控制布局时，可单独使用 `AnnotationCanvas`。绘图层采用绝对定位，父容器应设置 `position: relative` 和明确尺寸。
 
 ```vue
 <script setup lang="ts">
@@ -131,8 +133,8 @@ import 'lesson-whiteboard-vue/style.css'
 <template>
   <div style="height: 700px">
     <DocumentWhiteboard
-      mode="local" source="/files/lesson.pptx"
-      format="pptx" document-id="lesson-42-v1"
+      mode="local" source="/files/sample.pptx"
+      format="pptx" document-id="slides-42-v1"
     />
   </div>
 </template>
@@ -143,13 +145,13 @@ import 'lesson-whiteboard-vue/style.css'
 - 本地仅支持 `.pptx`、`.docx`，不支持旧版 `.ppt`、`.doc`。
 - URL 必须可下载，跨域时需允许 CORS。可选的 `request: RequestInit` 可传入请求头等 fetch 配置。
 - 包在浏览器中解析本地输入，不会上传文件；URL 输入由浏览器下载。PPTX 的外部媒体关系被阻止。
-- 为不同文档及内容版本指定稳定、互不相同的 `documentId`；批注页键例如 `lesson-42-v1:1`。
+- 为不同文档及内容版本指定稳定、互不相同的 `documentId`；批注页键例如 `slides-42-v1:1`。
 
 PPTX 使用 [@aiden0z/pptx-renderer](https://github.com/aiden0z/pptx-renderer)，DOCX 使用 [docx-preview](https://github.com/VolodymyrBaydalka/docxjs)。渲染内容位于禁止文档脚本执行的隔离 iframe 中。
 
 ### WPS WebOffice
 
-由宿主应用提供 SDK 加载函数和配置：
+由接入应用提供 SDK 加载函数和配置：
 
 ```vue
 <script setup lang="ts">
@@ -161,7 +163,7 @@ const wps: WpsOptions = {
   fileId: 'YOUR_FILE_ID',
   // 如果集成需要 token，在此传入当前内存中的会话 token。
   loadSDK: async () => {
-    // 宿主应先加载官方 SDK，再返回 SDK 对象。
+    // 接入应用应先加载官方 SDK，再返回 SDK 对象。
     const sdk = (window as unknown as { WebOfficeSDK?: unknown }).WebOfficeSDK
     if (!sdk) throw new Error('请先加载 WPS WebOffice SDK')
     return sdk
@@ -182,11 +184,11 @@ const wps: WpsOptions = {
 
 `format="pptx"` 使用 Presentation，`format="docx"` 使用 Writer。Presentation 的上一步/下一步会优先推进页内动画，再切换幻灯片。WPS Writer 当前支持浏览和定位，但未开放覆盖批注，因为其内部文档滚动尚未与外部画布同步。
 
-SDK 加载、token 续期、鉴权及服务授权由宿主负责。包不会读取应用 cookie 或环境变量，也不保存凭据。配置变化时替换 `wps` 对象以重新初始化；应用密钥应留在服务端。
+SDK 加载、token 续期、鉴权及服务授权由接入应用负责。包不会读取应用 cookie 或环境变量，也不保存凭据。配置变化时替换 `wps` 对象以重新初始化；应用密钥应留在服务端。
 
 ## 授课布局
 
-`TeachingLayout` 提供深色舞台、可选的双侧控制和带标签/工具/动作的底栏，不实现登录、资源获取、路由和下课流程。
+`TeachingLayout` 提供深色舞台、可选的双侧控制和带标签/工具/动作的底栏。可通过插槽和事件连接应用自己的资源选择、页面导航、身份认证或教学流程。
 
 ```vue
 <script setup lang="ts">
@@ -268,19 +270,20 @@ type DrawingTool =
 - ref 方法：`previous()`、`next()`、`goTo(page)`、`retry()`、`exportJSON()`、`importJSON(json)`，页码从 **1** 开始。
 - 批注 JSON 不包含 Office 原文件；恢复时仍需提供相同文档和 `documentId`。
 - 文档页键独立于会话的 `activePageId`。自定义控制时，应使用明确的文档页键查询历史和编辑该页。
+- 会话存续期间，文档翻页会保留已提交批注。接入应用可调用 `session.clearPage(pageKey)` 清空指定页（可撤销），或调用 `session.resetPage(pageKey)` 同时清除内容和历史；组件不会在翻页时自动清空批注。
 
 ### `TeachingLayout`
 
 - 属性：`page=1`、`totalPages=0`、`navigable=true`、`showNavigation=false`、`showResourceEntries=false`、`resourceLabel='资源'`。
 - 事件：`previous`、`next`、`close`、`resources`。
-- 插槽：`stage`、`tabs`、`tools`、`actions`、`navigation`、`resource-entry`、`overlays`，以及保留宿主既有结构的默认插槽。双侧插槽接收 `side: 'left' | 'right'`。
-- ref：根 DOM 元素 `element`，供宿主管理全屏。
+- 插槽：`stage`、`tabs`、`tools`、`actions`、`navigation`、`resource-entry`、`overlays`，以及用于自定义内容的默认插槽。双侧插槽接收 `side: 'left' | 'right'`。
+- ref：根 DOM 元素 `element`，供接入应用控制全屏。
 
 ### `createWpsOfficePlayer(options)`
 
-供现有宿主接入的底层 WPS 适配器。参数 `WpsPlayerOptions` 包含 `resource`（`fileId`、`code`）、`mount`、`loadSDK`、`appId`，以及可选的 `token`、`initialPage`、`onState`、`onPage`、`beforePageChange`。类型码为 `1`（Writer）、`3`（PDF）、`4`（Presentation）。
+用于自定义文档界面的底层 WPS 适配器。参数 `WpsPlayerOptions` 包含 `resource`（`fileId`、`code`）、`mount`、`loadSDK`、`appId`，以及可选的 `token`、`initialPage`、`onState`、`onPage`、`beforePageChange`。类型码为 `1`（Writer）、`3`（PDF）、`4`（Presentation）。
 
-返回 `start()`、`previous()`、`next()`、`goTo(page)`、`resize()`、`dispose()`。挂载容器、凭据、SDK 和适配器生命周期均由宿主管理。
+返回 `start()`、`previous()`、`next()`、`goTo(page)`、`resize()`、`dispose()`。挂载容器、凭据、SDK 和适配器生命周期均由接入应用管理。
 
 ## 会话与 JSON
 
@@ -311,7 +314,7 @@ import { createWhiteboardSession } from 'lesson-whiteboard-vue'
 
 const session = createWhiteboardSession()
 const json = session.exportJSON()
-// 通过宿主自己的文件、服务端或浏览器存储流程保存 json。
+// 通过应用自己的文件、服务端或浏览器存储流程保存 json。
 session.importJSON(json)
 session.dispose()
 ```
@@ -337,9 +340,9 @@ JSON 保存页面、逻辑尺寸、背景和图形，不保存撤销栈、选框
 
 ### 所有权
 
-`Whiteboard` 和 `DocumentWhiteboard` 未接收外部会话时，会自行创建并在卸载时销毁会话。传入的外部会话由宿主管理；调用 `dispose()` 前应先卸载全部使用者，适合在父组件的 `onUnmounted()` 中释放。销毁后仍可读取文档，写入会抛错。
+`Whiteboard` 和 `DocumentWhiteboard` 未接收外部会话时，会自行创建并在卸载时销毁会话。接入应用负责管理传入的外部会话；调用 `dispose()` 前应先卸载全部使用者，适合在父组件的 `onUnmounted()` 中释放。销毁后仍可读取文档，写入会抛错。
 
-不同会话隔离多个白板；共享会话是显式选择。会话变更提供已提交快照，不逐次通知指针移动。持久化及自动保存调度由宿主实现；会话方法本身不发起网络请求。
+不同会话隔离多个白板；共享会话是显式选择。会话变更提供已提交快照，不逐次通知指针移动。接入应用自行选择保存位置和自动保存频率；会话方法本身不发起网络请求。
 
 ## 功能限制
 
@@ -361,6 +364,8 @@ npm ci
 npm run dev
 ```
 
+开发服务启动后会自动打开示例首页。点击导航中的“文档预览”或“授课界面”即可进入对应示例，两个页面均提供返回入口，无需手动输入页面地址。
+
 | 地址 / 命令 | 用途 |
 | --- | --- |
 | `/` | 完整白板、自定义画布、独立实例和 JSON 示例 |
@@ -371,8 +376,6 @@ npm run dev
 | `npm run build` | 构建 ESM、TypeScript 声明和 CSS |
 | `npm run build:example` | 构建三个示例入口 |
 | `npm pack` | 执行检查和构建，生成可安装压缩包 |
-
-本仓库独立于原 lesson 应用。宿主兼容适配负责保留该应用的路由、资源选择、鉴权和授课策略，这些业务不属于包本身。原宿主在确认课件翻到不同页后清空批注，白板翻页则保留内容。
 
 贡献说明见 [CONTRIBUTING.md](./CONTRIBUTING.md)。请勿提交真实课件、凭据或环境文件。
 

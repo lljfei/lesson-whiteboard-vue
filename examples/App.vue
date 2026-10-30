@@ -91,7 +91,7 @@ onUnmounted(() => {
         <span class="demo-brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
         <span>白板实验室<small>LESSON WHITEBOARD</small></span>
       </a>
-      <div class="demo-nav-heading">探索示例 <span>04</span></div>
+      <div class="demo-nav-heading">探索示例 <span>06</span></div>
       <nav class="demo-nav" aria-label="示例场景">
         <button v-for="item in scenes" :key="item.id" type="button" :aria-pressed="scene === item.id"
           :class="{ active: scene === item.id }" @click="scene = item.id" :data-testid="`scene-${item.id}`">
@@ -99,6 +99,16 @@ onUnmounted(() => {
           <span>{{ item.title }}<small>{{ item.subtitle }}</small></span>
           <span class="demo-nav-arrow" aria-hidden="true">↗</span>
         </button>
+        <a href="./office.html">
+          <span class="demo-nav-number">05</span>
+          <span>文档预览<small>PPTX / Word · 本地与 WPS</small></span>
+          <span class="demo-nav-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a href="./teaching.html">
+          <span class="demo-nav-number">06</span>
+          <span>授课界面<small>文档批注 · 黑板切换</small></span>
+          <span class="demo-nav-arrow" aria-hidden="true">↗</span>
+        </a>
       </nav>
       <div class="demo-sidebar-note">
         <span class="demo-status-dot"></span><strong>为你的 Vue 应用而生</strong>

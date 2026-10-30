@@ -74,7 +74,9 @@ import 'lesson-whiteboard-vue/style.css'
 
 Import the stylesheet once and give the parent a real height. The default board is green; this example chooses a white pen. Vue is a peer dependency. No global Konva registration, Ant Design, Less, or auto-import plugin is required.
 
-`expanded` fills the component's container; browser fullscreen remains a host application action.
+Konva, vue-konva, and the Office renderers are runtime dependencies installed automatically by npm. Vitest, Vue Test Utils, and Happy DOM are only needed when developing this repository; applications using the published package do not need to install them.
+
+`expanded` fills the component's container; your application controls browser fullscreen.
 
 ## Custom canvas and toolbar
 
@@ -131,8 +133,8 @@ import 'lesson-whiteboard-vue/style.css'
 <template>
   <div style="height: 700px">
     <DocumentWhiteboard
-      mode="local" source="/files/lesson.pptx"
-      format="pptx" document-id="lesson-42-v1"
+      mode="local" source="/files/sample.pptx"
+      format="pptx" document-id="slides-42-v1"
     />
   </div>
 </template>
@@ -143,13 +145,13 @@ import 'lesson-whiteboard-vue/style.css'
 - Only `.pptx` and `.docx` are supported locally; legacy `.ppt` and `.doc` are not.
 - URL downloads need an accessible response and CORS when cross-origin. Optional `request: RequestInit` supplies fetch options such as headers.
 - The package parses local input in the browser without uploading it. URL input is downloaded by the browser. PPTX external media relationships are blocked.
-- Give each document and content revision a stable, distinct `documentId`; annotations use keys such as `lesson-42-v1:1`.
+- Give each document and content revision a stable, distinct `documentId`; annotations use keys such as `slides-42-v1:1`.
 
 PPTX uses [@aiden0z/pptx-renderer](https://github.com/aiden0z/pptx-renderer), and DOCX uses [docx-preview](https://github.com/VolodymyrBaydalka/docxjs). Rendered content is isolated in an iframe that disallows document scripts.
 
 ### WPS WebOffice
 
-Provide the SDK loader and configuration from your host application:
+Provide the SDK loader and configuration from your application:
 
 ```vue
 <script setup lang="ts">
@@ -161,7 +163,7 @@ const wps: WpsOptions = {
   fileId: 'YOUR_FILE_ID',
   // Supply an in-memory session token here if your integration requires one.
   loadSDK: async () => {
-    // The host must load the official SDK before returning it.
+    // Your application must load the official SDK before returning it.
     const sdk = (window as unknown as { WebOfficeSDK?: unknown }).WebOfficeSDK
     if (!sdk) throw new Error('Load the WPS WebOffice SDK first')
     return sdk
@@ -182,11 +184,11 @@ You must configure a WebOffice application and its backend file/permission callb
 
 Use `format="pptx"` for Presentation and `format="docx"` for Writer. Presentation previous/next actions advance animation steps before moving between slides. WPS Writer currently offers browsing/navigation without an annotation overlay, because internal document scrolling is not synchronized with the external canvas.
 
-SDK loading, token renewal, authorization, and service entitlement belong to the host. The package does not read application cookies or environment variables and does not store credentials. Replace the `wps` object to reinitialize a changed configuration. Keep app secrets on your server.
+Your application manages SDK loading, token renewal, authorization, and service entitlement. The package does not read application cookies or environment variables and does not store credentials. Replace the `wps` object to reinitialize a changed configuration. Keep app secrets on your server.
 
 ## Teaching layout
 
-`TeachingLayout` provides a dark stage, optional side controls, and a footer with tabs/tools/actions. It does not implement login, resource fetching, routing, or classroom completion.
+`TeachingLayout` provides a dark stage, optional side controls, and a footer with tabs/tools/actions. Use its slots and events to connect your application's resource selection, navigation, authentication, or teaching workflow.
 
 ```vue
 <script setup lang="ts">
@@ -268,19 +270,20 @@ type DrawingTool =
 - Ref methods: `previous()`, `next()`, `goTo(page)`, `retry()`, `exportJSON()`, `importJSON(json)`. Page numbers start at **1**.
 - Annotation JSON does not include the Office file. Restore it alongside the same document and `documentId`.
 - Document page keys are independent of the session's `activePageId`. For custom controls, query history and edit the explicit page key.
+- Page navigation retains committed annotations while the session is alive. Applications can clear an explicit page with `session.clearPage(pageKey)` (undoable) or `session.resetPage(pageKey)` (also clears history); the component does not automatically clear annotations on page changes.
 
 ### `TeachingLayout`
 
 - Props: `page=1`, `totalPages=0`, `navigable=true`, `showNavigation=false`, `showResourceEntries=false`, `resourceLabel='资源'`.
 - Events: `previous`, `next`, `close`, `resources`.
-- Slots: `stage`, `tabs`, `tools`, `actions`, `navigation`, `resource-entry`, `overlays`, and a default slot for an existing host structure. The two side slots receive `side: 'left' | 'right'`.
-- Ref: `element`, the root DOM element, for host-managed fullscreen.
+- Slots: `stage`, `tabs`, `tools`, `actions`, `navigation`, `resource-entry`, `overlays`, and a default slot for custom content. The two side slots receive `side: 'left' | 'right'`.
+- Ref: `element`, the root DOM element, for application-controlled fullscreen.
 
 ### `createWpsOfficePlayer(options)`
 
-Low-level WPS adapter for existing host integrations. Accepts `WpsPlayerOptions`: `resource` (`fileId`, `code`), `mount`, `loadSDK`, `appId`, optional `token`, `initialPage`, `onState`, `onPage`, and `beforePageChange`. Codes are `1` (Writer), `3` (PDF), and `4` (Presentation).
+Low-level WPS adapter for custom document interfaces. Accepts `WpsPlayerOptions`: `resource` (`fileId`, `code`), `mount`, `loadSDK`, `appId`, optional `token`, `initialPage`, `onState`, `onPage`, and `beforePageChange`. Codes are `1` (Writer), `3` (PDF), and `4` (Presentation).
 
-Returns `start()`, `previous()`, `next()`, `goTo(page)`, `resize()`, and `dispose()`. The host owns the mount, credentials, SDK, and adapter lifetime.
+Returns `start()`, `previous()`, `next()`, `goTo(page)`, `resize()`, and `dispose()`. Your application manages the mount, credentials, SDK, and adapter lifetime.
 
 ## Sessions and JSON
 
@@ -337,9 +340,9 @@ Import validates the complete document before replacing state. Invalid JSON or f
 
 ### Ownership
 
-`Whiteboard` and `DocumentWhiteboard` create and dispose their own session when none is supplied. An externally supplied session remains the host's responsibility. Unmount all its consumers before calling `dispose()`; a parent's `onUnmounted()` is suitable. Reads remain available after disposal; writes throw.
+`Whiteboard` and `DocumentWhiteboard` create and dispose their own session when none is supplied. Your application manages the lifetime of an externally supplied session. Unmount all its consumers before calling `dispose()`; a parent's `onUnmounted()` is suitable. Reads remain available after disposal; writes throw.
 
-Separate sessions isolate multiple boards. Sharing one is an explicit choice. Session changes provide committed snapshots, not pointer-move updates. Persistence and autosave scheduling belong to the host; session methods themselves do not make network requests.
+Separate sessions isolate multiple boards. Sharing one is an explicit choice. Session changes provide committed snapshots, not pointer-move updates. Your application chooses the storage location and autosave schedule; session methods themselves do not make network requests.
 
 ## Limitations
 
@@ -361,6 +364,8 @@ npm ci
 npm run dev
 ```
 
+The development server opens the example homepage automatically. Click **Document preview** (文档预览) or **Teaching workspace** (授课界面) in its navigation to open the other examples. Both pages provide a return link; no manual URL entry is needed.
+
 | URL / command | Purpose |
 | --- | --- |
 | `/` | Complete board, custom canvas, independent instances, JSON examples |
@@ -371,8 +376,6 @@ npm run dev
 | `npm run build` | Build ESM, TypeScript declarations, and CSS |
 | `npm run build:example` | Build the three example entry points |
 | `npm pack` | Run checks/build and generate the installable tarball |
-
-The repository is independent of the original lesson application. Host compatibility adapters preserve that application's routes, resource selection, authentication, and classroom policies; they are not part of this package. The original host clears courseware annotations on a confirmed page change, while board page navigation retains content.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for contributions. Do not commit real courseware, credentials, or environment files.
 

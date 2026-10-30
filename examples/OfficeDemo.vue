@@ -32,7 +32,7 @@ const openWps = () => {
 </script>
 <template>
   <main class="office-demo">
-    <header><a href="/">← 返回白板示例</a><h1>PPTX / Word 文档画板</h1><p>本地文件在浏览器中解析；在线模式通过你自己的 WPS 服务打开。</p></header>
+    <header><nav aria-label="示例导航"><a href="./index.html">← 返回白板示例</a><a href="./teaching.html">授课界面</a></nav><h1>PPTX / Word 文档画板</h1><p>本地文件在浏览器中解析；在线模式通过你自己的 WPS 服务打开。</p></header>
     <section class="inputs">
       <button @click="sample('pptx')">加载示例 PPTX</button><button @click="sample('docx')">加载示例 Word</button>
       <label>选择本地文件 <input type="file" accept=".pptx,.docx" @change="select" /></label>
@@ -45,5 +45,6 @@ const openWps = () => {
   </main>
 </template>
 <style scoped>
+nav{display:flex;gap:24px;flex-wrap:wrap}
 .office-demo{max-width:1440px;margin:24px auto;padding:0 24px;font-family:system-ui;color:#233c32}.inputs{display:flex;gap:10px;flex-wrap:wrap;padding:16px;background:#f0f5f1;border-radius:8px;margin:20px 0}.inputs input,.inputs button,.inputs select{padding:8px;border:1px solid #bccfc1;border-radius:4px}details{width:100%}.viewer{height:650px}a{color:#286b4e}p{line-height:1.6}
 </style>

@@ -1,6 +1,6 @@
 {
   "name": "lesson-whiteboard-vue",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Composable Vue 3 teaching whiteboard with multi-page drawing, JSON persistence, and PPTX/DOCX previews",
   "license": "MIT",
   "type": "module",
@@ -25,7 +25,7 @@
     "**/*.css"
   ],
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
+    "dev": "vite --host 127.0.0.1 --open",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "build": "vite build && vue-tsc -p tsconfig.build.json",
     "build:example": "vite build --config vite.example.config.ts",

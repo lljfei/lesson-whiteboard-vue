@@ -37,7 +37,7 @@ onBeforeUnmount(() => { docSession.dispose(); boardSession.dispose() })
       <DocumentWhiteboard ref="document" v-model:tool="tool" v-model:color="color" v-model:stroke-width="width" :source="source" :format="format" :document-id="documentId" :session="docSession" :show-controls="false" :show-toolbar="false" @page-change="page = $event" @ready="setState" @error="notice = $event.message" />
       <Whiteboard v-if="boardOpen" v-model:tool="tool" v-model:color="color" v-model:stroke-width="width" :session="boardSession" :show-toolbar="false" @update:open="boardOpen = $event" class="demo-board" />
     </template>
-    <template #tabs><button v-for="type in (['pptx', 'docx'] as const)" :key="type" class="tab" :class="{ selected: format === type }" @click="select(type)">{{ type === 'pptx' ? '示例教学课件.pptx' : '示例教学文档.docx' }}</button></template>
+    <template #tabs><a class="tab example-home" href="./index.html">← 返回示例</a><button v-for="type in (['pptx', 'docx'] as const)" :key="type" class="tab" :class="{ selected: format === type }" @click="select(type)">{{ type === 'pptx' ? '示例教学课件.pptx' : '示例教学文档.docx' }}</button></template>
     <template #tools>
       <WhiteboardToolbar v-model:tool="tool" v-model:color="color" v-model:stroke-width="width" variant="teaching" :can-undo="session.canUndo(key)" :can-redo="session.canRedo(key)" @undo="session.undo(key)" @redo="session.redo(key)" @clear="session.getPage(key) && session.clearPage(key)">
         <button class="board-button" :class="{ selected: boardOpen }" @click="toggleBoard"><BoardIcon name="board" /><span>黑板</span></button>
@@ -48,6 +48,7 @@ onBeforeUnmount(() => { docSession.dispose(); boardSession.dispose() })
   </TeachingLayout>
 </template>
 <style scoped>
+.example-home{display:inline-flex;align-items:center;text-decoration:none}
 .demo-room{position:fixed;inset:0}.tab,.action{min-height:42px;padding:0 10px;border:0;border-radius:5px;color:#d4dbe6;background:#273a57;white-space:nowrap;cursor:pointer}.selected{color:white!important;background:#2672ff!important}.demo-board{position:absolute;inset:0;border:0;border-radius:0}.board-button{min-width:64px;height:64px;border:0;background:transparent;color:#c8d0dc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer}.board-button span{font-size:12px}.notice{position:absolute;z-index:40;left:50%;top:24px;transform:translateX(-50%);max-width:80%;padding:18px;border-radius:8px;background:white;color:#253b30;box-shadow:0 4px 20px #0003}.notice button{margin-left:12px}
 .demo-room :deep(.office-board){border:0;border-radius:0;background:#191919}
 </style>
