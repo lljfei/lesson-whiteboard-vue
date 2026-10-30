@@ -1,7 +1,7 @@
 {
   "name": "lesson-whiteboard-vue",
-  "version": "0.3.0",
-  "description": "Vue 3 多页教学白板，支持独立绘图、工具栏组合和 JSON 保存恢复",
+  "version": "0.3.1",
+  "description": "Composable Vue 3 teaching whiteboard with multi-page drawing, JSON persistence, and PPTX/DOCX previews",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,6 +17,7 @@
   "files": [
     "dist",
     "README.md",
+    "README.zh-CN.md",
     "LICENSE",
     "THIRD_PARTY_NOTICES.md"
   ],
