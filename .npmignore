@@ -1,0 +1,7 @@
+examples/
+tests/
+public/
+example-dist/
+node_modules/
+*.tgz
+.env*

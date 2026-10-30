@@ -1,0 +1,67 @@
+{
+  "name": "lesson-whiteboard-vue",
+  "version": "0.3.0",
+  "description": "Vue 3 多页教学白板，支持独立绘图、工具栏组合和 JSON 保存恢复",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "build:example": "vite build --config vite.example.config.ts",
+    "test": "vitest run && node --test tests/office-player.node.test.js",
+    "prepack": "npm run typecheck && npm test && npm run build"
+  },
+  "peerDependencies": {
+    "vue": ">=3.5.0 <4"
+  },
+  "dependencies": {
+    "@aiden0z/pptx-renderer": "1.4.0",
+    "docx-preview": "0.4.1",
+    "konva": "^10.9.0",
+    "vue-konva": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^20.0.0",
+    "jsdom": "^26.1.0",
+    "typescript": "~5.9.3",
+    "vite": "~6.4.5",
+    "vitest": "~3.2.7",
+    "vue": "~3.5.13",
+    "vue-tsc": "~3.3.13"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lljfei/lesson-whiteboard-vue.git"
+  },
+  "homepage": "https://github.com/lljfei/lesson-whiteboard-vue#readme",
+  "bugs": {
+    "url": "https://github.com/lljfei/lesson-whiteboard-vue/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
