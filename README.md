@@ -188,7 +188,7 @@ Your application manages SDK loading, token renewal, authorization, and service 
 
 ## Teaching layout
 
-`TeachingLayout` provides a dark stage, optional side controls, and a footer with tabs/tools/actions. Use its slots and events to connect your application's resource selection, navigation, authentication, or teaching workflow.
+`TeachingLayout` follows the lesson teaching workspace with separate tabs/tools/actions, blue selection states, and optional side controls. Use its slots and events to connect your application's resource selection, navigation, authentication, or teaching workflow.
 
 ```vue
 <script setup lang="ts">
@@ -231,6 +231,7 @@ All entries below, plus their associated TypeScript types, are named exports fro
 | `v-model:open` | `true` | Closing hides the board and retains its session |
 | `v-model:expanded` | `false` | Expand inside the container |
 | `showToolbar` | `true` | Show the default toolbar |
+| `variant` | `'default'` | Use `'teaching'` for a transparent, borderless container and teaching controls; the underlying document remains visible below the collapsed board |
 | `tools`, `colors`, `strokeWidths` | Built-in lists | Customize toolbar choices |
 
 - Events: `change(SessionChange)`, `history-change(HistoryChange)`, and model updates. History state is also reported on initialization and session replacement.
@@ -278,6 +279,8 @@ type DrawingTool =
 - Events: `previous`, `next`, `close`, `resources`.
 - Slots: `stage`, `tabs`, `tools`, `actions`, `navigation`, `resource-entry`, `overlays`, and a default slot for custom content. The two side slots receive `side: 'left' | 'right'`.
 - Ref: `element`, the root DOM element, for application-controlled fullscreen.
+- When using the stage and footer slots, layout follows the container width: a 64px footer above 1280px; a 120px footer with a separate tabs row at 600–1280px when both tabs and tools are supplied; separate tabs, tools, and actions rows at 600px and below. Duplicate right-side controls are hidden at 900px and below.
+- The default slot preserves a host's own layout, including lesson's existing workspace. Footer layout rules apply to the named slots and do not rearrange default-slot content.
 
 ### `createWpsOfficePlayer(options)`
 

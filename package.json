@@ -1,6 +1,6 @@
 {
   "name": "lesson-whiteboard-vue",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Composable Vue 3 teaching whiteboard with multi-page drawing, JSON persistence, and PPTX/DOCX previews",
   "license": "MIT",
   "type": "module",

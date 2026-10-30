@@ -35,7 +35,7 @@ const saveSession = createWhiteboardSession()
 const sessions = [fullSession, customSession, leftSession, rightSession, saveSession]
 const lastAction = ref('等待第一笔')
 const customTool = ref<DrawingTool>('pen')
-const customColor = ref('#245c4b')
+const customColor = ref('#2672ff')
 const customWidth = ref(5)
 const customHistory = ref({ canUndo: false, canRedo: false })
 const customTools: Array<{ tool: DrawingTool; label: string; icon: string }> = [
@@ -89,7 +89,7 @@ onUnmounted(() => {
     <aside class="demo-sidebar">
       <a class="demo-brand" href="#" @click.prevent="scene = 'complete'" aria-label="返回完整白板示例">
         <span class="demo-brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span>白板实验室<small>LESSON WHITEBOARD</small></span>
+        <span>教学白板<small>备授课 · 组件示例</small></span>
       </a>
       <div class="demo-nav-heading">探索示例 <span>06</span></div>
       <nav class="demo-nav" aria-label="示例场景">
@@ -115,7 +115,7 @@ onUnmounted(() => {
         <p>保留教学白板的熟悉体验，也给自定义界面留出空间。</p>
         <code>lesson-whiteboard-vue</code>
       </div>
-      <div class="demo-sidebar-footer"><span>Vue 3 · Konva</span><span>v0.3.0</span></div>
+      <div class="demo-sidebar-footer"><span>Vue 3 · Konva</span><span>v0.3.3</span></div>
     </aside>
 
     <main class="demo-main">
@@ -129,7 +129,7 @@ onUnmounted(() => {
         <section v-if="scene === 'complete'" class="demo-panel" aria-label="完整白板示例">
           <div class="demo-panel-heading"><span><i class="demo-status-dot"></i> 创作空间</span><span>{{ fullSession.state.pages.length }} 页 · {{ totalShapes(fullSession) }} 个图形</span></div>
           <div class="demo-board-frame demo-board-frame-main" data-testid="complete-board">
-            <Whiteboard :session="fullSession" color="#ffffff" @change="lastAction = actionLabels[$event.type]" />
+            <Whiteboard :session="fullSession" variant="teaching" color="#ffffff" @change="lastAction = actionLabels[$event.type]" />
           </div>
           <div class="demo-panel-footer"><span>{{ lastAction }}</span><span>支持鼠标与触摸 · 关闭后内容保留</span></div>
         </section>

@@ -46,5 +46,5 @@ const openWps = () => {
 </template>
 <style scoped>
 nav{display:flex;gap:24px;flex-wrap:wrap}
-.office-demo{max-width:1440px;margin:24px auto;padding:0 24px;font-family:system-ui;color:#233c32}.inputs{display:flex;gap:10px;flex-wrap:wrap;padding:16px;background:#f0f5f1;border-radius:8px;margin:20px 0}.inputs input,.inputs button,.inputs select{padding:8px;border:1px solid #bccfc1;border-radius:4px}details{width:100%}.viewer{height:650px}a{color:#286b4e}p{line-height:1.6}
+.office-demo{max-width:1440px;margin:24px auto;padding:0 24px;font-family:"Microsoft YaHei","Segoe UI",sans-serif;color:#252b3a}.inputs{display:flex;gap:10px;flex-wrap:wrap;padding:16px;background:#f5f7fa;border:1px solid #e5e6eb;border-radius:8px;margin:20px 0}.inputs input,.inputs button,.inputs select{box-sizing:border-box;min-width:0;max-width:100%;padding:8px 12px;border:1px solid #dbe1ea;border-radius:5px;background:#fff;font:inherit;color:inherit}.inputs button{cursor:pointer}.inputs button:hover{color:#2672ff;border-color:#2672ff}details{width:100%}.viewer{height:650px}a{color:#2672ff;text-decoration:none}p{line-height:1.8;color:#86909c}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #2672ff;outline-offset:2px}@media(max-width:600px){.office-demo{padding-inline:12px}.office-demo h1{font-size:24px}.viewer{height:560px}}
 </style>

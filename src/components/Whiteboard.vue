@@ -13,6 +13,7 @@ const props = withDefaults(defineProps<{
   tools?: DrawingTool[]
   colors?: string[]
   strokeWidths?: number[]
+  variant?: 'default' | 'teaching'
 }>(), { showToolbar: true })
 const tool = defineModel<DrawingTool>('tool', { default: 'pen' })
 const color = defineModel<string>('color', { default: '#111827' })
@@ -62,7 +63,7 @@ onBeforeUnmount(() => { ownedSession?.dispose() })
 </script>
 
 <template>
-  <section class="wb-root" aria-label="多页画板" data-testid="whiteboard" :data-open="open">
+  <section class="wb-root" :class="{ 'wb-root--teaching': variant === 'teaching' }" aria-label="多页画板" data-testid="whiteboard" :data-open="open">
     <div class="wb-viewport">
       <div v-show="open" class="wb-panel" :class="[session.state.background, { expanded }]" data-testid="board-panel">
         <AnnotationCanvas :session="session" :tool="tool" :color="color" :stroke-width="strokeWidth" :active="open" />
@@ -107,7 +108,7 @@ onBeforeUnmount(() => { ownedSession?.dispose() })
         :set-tool="setTool" :set-color="setColor" :set-stroke-width="setStrokeWidth" :can-undo="canUndo" :can-redo="canRedo"
         :undo="undo" :redo="redo" :clear="clear">
         <WhiteboardToolbar v-model:tool="tool" v-model:color="color" v-model:stroke-width="strokeWidth"
-          :tools="tools" :colors="colors" :stroke-widths="strokeWidths" :can-undo="canUndo" :can-redo="canRedo"
+          :variant="variant" :tools="tools" :colors="colors" :stroke-widths="strokeWidths" :can-undo="canUndo" :can-redo="canRedo"
           @undo="undo" @redo="redo" @clear="clear">
           <slot name="toolbar-actions" :session="session" />
         </WhiteboardToolbar>
@@ -140,4 +141,21 @@ button:disabled { color: #a5b0bd; cursor: default; }
 .wb-page-delete { position: absolute; top: 9px; right: 9px; min-width: 30px; min-height: 30px; padding: 5px; color: #fff; background: #213246dd; }
 .wb-page-delete:disabled { color: #d5dde6; background: #526173cc; }
 .wb-page-delete :deep(svg) { width: 17px; height: 17px; }
+.wb-root--teaching { min-height: 0; border: 0; border-radius: 0; background: transparent; font-family: inherit; }
+.wb-root--teaching .wb-footer { position: relative; z-index: 30; }
+.wb-root--teaching .wb-pages { z-index: 22; right: 22px; bottom: 14px; left: auto; padding: 6px; }
+.wb-root--teaching .wb-pages button { min-width: 46px; min-height: 42px; }
+.wb-root--teaching .wb-preview { z-index: 24; right: 22px; bottom: 74px; max-height: calc(100% - 88px); }
+.wb-root--teaching .wb-preview-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 16px; }
+@container teaching (max-width: 600px) {
+  .wb-root--teaching .wb-pages { right: 8px; bottom: 8px; max-width: calc(100% - 16px); gap: 0; }
+  .wb-root--teaching .wb-pages button { min-width: 36px; padding-inline: 6px; }
+  .wb-root--teaching .wb-preview { right: 8px; width: calc(100% - 16px); }
+  .wb-root--teaching .wb-preview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+}
+@container teaching (max-width: 360px) {
+  .wb-root--teaching .wb-pages button { min-width: 32px; padding-inline: 4px; }
+  .wb-root--teaching .wb-pages :deep(svg) { width: 18px; height: 18px; }
+  .wb-root--teaching .wb-pages button > span { display: none; }
+}
 </style>

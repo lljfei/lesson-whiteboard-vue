@@ -25,6 +25,7 @@ const paths: Record<string, string> = {
   board: 'M3 4h18v14H3Z M8 22l4-4 4 4',
   previous: 'M6 4v16 M18 5 8 12l10 7Z',
   next: 'M18 4v16 M6 5l10 7-10 7Z',
+  power: 'M12 2v10 M6 5a9 9 0 1 0 12 0',
 }
 </script>
 

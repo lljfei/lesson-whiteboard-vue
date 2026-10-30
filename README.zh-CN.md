@@ -188,7 +188,7 @@ SDK 加载、token 续期、鉴权及服务授权由接入应用负责。包不�
 
 ## 授课布局
 
-`TeachingLayout` 提供深色舞台、可选的双侧控制和带标签/工具/动作的底栏。可通过插槽和事件连接应用自己的资源选择、页面导航、身份认证或教学流程。
+`TeachingLayout` 沿用 lesson 授课页的底栏分区、蓝色选中态和双侧控制。可通过插槽和事件连接应用自己的资源选择、页面导航、身份认证或教学流程。
 
 ```vue
 <script setup lang="ts">
@@ -231,6 +231,7 @@ async function enterFullscreen() {
 | `v-model:open` | `true` | 关闭只隐藏，保留会话 |
 | `v-model:expanded` | `false` | 在容器内展开 |
 | `showToolbar` | `true` | 显示默认工具栏 |
+| `variant` | `'default'` | 设为 `'teaching'` 时使用透明无边框容器与授课页控件布局，收起画板后露出底层课件 |
 | `tools`、`colors`、`strokeWidths` | 内置列表 | 自定义工具栏选项 |
 
 - 事件：`change(SessionChange)`、`history-change(HistoryChange)` 和模型更新。初始化、更换会话时也报告历史状态。
@@ -278,6 +279,8 @@ type DrawingTool =
 - 事件：`previous`、`next`、`close`、`resources`。
 - 插槽：`stage`、`tabs`、`tools`、`actions`、`navigation`、`resource-entry`、`overlays`，以及用于自定义内容的默认插槽。双侧插槽接收 `side: 'left' | 'right'`。
 - ref：根 DOM 元素 `element`，供接入应用控制全屏。
+- 使用 `stage` 和底栏插槽时，按容器宽度适配：大于 1280px 为 64px 单行底栏；标签与工具同时存在时，600–1280px 为 120px 双行底栏；600px 及以下将标签、工具、授课操作分别排列。900px 及以下隐藏重复的右侧入口与翻页控制。
+- 默认插槽供 lesson 等宿主保留自有布局；上述底栏布局只作用于组件提供的具名插槽，不会重排宿主的默认插槽内容。
 
 ### `createWpsOfficePlayer(options)`
 

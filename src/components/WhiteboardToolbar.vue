@@ -140,6 +140,16 @@ button:focus-visible { outline: 2px solid #8fc5ff; outline-offset: -2px; }
 .width-options span { display: block; width: 20px; border-top: solid currentColor; border-radius: 4px; }
 .color-options button { width: 28px; min-width: 28px; min-height: 28px; height: 28px; padding: 0; border: 2px solid #64748b; }
 .color-options button.selected { outline: 2px solid #fff; outline-offset: 2px; }
-.wb-toolbar--teaching{flex-wrap:nowrap;justify-content:flex-start;gap:0;padding:0;height:64px;border-radius:5px 5px 0 0;background:#111c2d}.wb-toolbar--teaching>button{min-width:64px;height:64px;border-radius:0;padding:8px 10px 6px}.wb-toolbar--teaching>.divider{display:none}.wb-toolbar--teaching :deep(svg){width:20px;height:20px}
+.wb-toolbar--teaching{flex-wrap:nowrap;justify-content:flex-start;gap:0;padding:0;height:64px;min-width:0;border-radius:5px 5px 0 0;background:#111c2d}.wb-toolbar--teaching>button,.wb-toolbar--teaching>:slotted(button){flex-shrink:0;min-width:64px;height:64px;border-radius:0;padding:8px 10px 6px}.wb-toolbar--teaching>.divider{display:none}.wb-toolbar--teaching :deep(svg){width:20px;height:20px}
 @media(max-width:1100px){.wb-toolbar--teaching>button{min-width:56px;padding-inline:8px}}@media(max-width:760px){.wb-toolbar--teaching>button{min-width:44px;padding-inline:4px}}
+@container teaching (max-width: 1100px) {
+  .wb-toolbar--teaching > button, .wb-toolbar--teaching > :slotted(button) { min-width: 56px; padding-inline: 8px; }
+}
+@container teaching (max-width: 760px) {
+  .wb-toolbar--teaching > button, .wb-toolbar--teaching > :slotted(button) { min-width: 44px; padding-inline: 4px; }
+}
+@container teaching (max-width: 600px) {
+  .wb-toolbar--teaching > button, .wb-toolbar--teaching > :slotted(button) { flex: 1 1 0; min-width: 0; padding-inline: 2px; }
+  .wb-toolbar--teaching .options { gap: 8px; padding: 10px; }
+}
 </style>
